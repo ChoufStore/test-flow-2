@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test-flow-2 - ChoufStore</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #ECF0F1;
+            color: #2C3E50;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2C3E50, #E67E22);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-family: 'Helvetica', sans-serif;
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .product-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+        
+        .product-card h3 {
+            color: #2C3E50;
+            margin-bottom: 10px;
+        }
+        
+        .price {
+            font-size: 1.5em;
+            color: #E67E22;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        
+        .btn {
+            background-color: #2C3E50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #E67E22;
+        }
+        
+        .footer {
+            background-color: #2C3E50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🇲🇦 test-flow-2</h1>
+        <p>Traditional Moroccan Products, Modern Quality</p>
+    </div>
+    
+    <div class="container">
+        <h2>Our Products</h2>
+        <div class="products-grid" id="products-grid">
+            <p>Loading products...</p>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>&copy; 2026 test-flow-2 - A ChoufStore Creation</p>
+    </div>
+
+    <script>
+        // Load products from Firebase
+        fetch('https://firestore.googleapis.com/v1/projects/choufstore-1a66b/databases/(default)/documents/stores/test-flow-2/products')
+            .then(response => response.json())
+            .then(data => {
+                const grid = document.getElementById('products-grid');
+                if (data.documents) {
+                    let html = '';
+                    data.documents.forEach(doc => {
+                        const fields = doc.fields;
+                        html += `
+                            <div class="product-card">
+                                <div class="product-icon">${fields.icon?.stringValue || '📦'}</div>
+                                <h3>${fields.name.stringValue}</h3>
+                                <p>${fields.description?.stringValue || ''}</p>
+                                <div class="price">${fields.price.integerValue} MAD</div>
+                                <button class="btn">View Details</button>
+                            </div>
+                        `;
+                    });
+                    grid.innerHTML = html;
+                } else {
+                    grid.innerHTML = '<p>No products yet. Check back soon!</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading products:', error);
+                document.getElementById('products-grid').innerHTML = '<p>Error loading products</p>';
+            });
+    </script>
+</body>
+</html>
